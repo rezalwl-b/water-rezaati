@@ -6,286 +6,100 @@
   <title>یادآور ۸ لیوان آب — نوشیدن آب</title>
   <style>
     :root{
-      --bg:#E9F7FF;
-      --card:#ffffff;
-      --accent:#2aa7ff;
-      --glass-border:#c6e7ff;
-      --water:#7fd3ff;
-      --happy-green:#6cc06c;
-      --muted:#6b6b6b;
-      font-family: 'Vazirmatn', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      --bg:#E9F7FF;--card:#ffffff;--accent:#2aa7ff;--glass-border:#c6e7ff;--water:#7fd3ff;--muted:#6b6b6b;
+      font-family:'Vazirmatn',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;
     }
-    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#f8ffff);}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#f8ffff)}
     .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:2rem}
-
-    .card{width:100%;max-width:980px;background:var(--card);border-radius:20px;box-shadow:0 10px 30px rgba(60,120,150,0.12);padding:28px;display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:center}
+    .card{width:100%;max-width:1000px;background:var(--card);border-radius:20px;box-shadow:0 10px 30px rgba(60,120,150,.12);padding:28px;display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start}
 
     h1{margin:0 0 6px 0;font-size:20px;text-align:right}
     p.lead{margin:0 0 18px 0;color:var(--muted);text-align:right}
 
-    /* glasses area */
     .glasses{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-    .glass{background:linear-gradient(180deg,rgba(255,255,255,0.8),rgba(255,255,255,0.6));border-radius:14px;padding:10px;border:2px solid var(--glass-border);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;cursor:pointer;transition:transform .18s ease,box-shadow .18s}
+    .glass{background:linear-gradient(180deg,rgba(255,255,255,.8),rgba(255,255,255,.6));border-radius:14px;padding:10px;border:2px solid var(--glass-border);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;cursor:pointer;transition:transform .18s ease,box-shadow .18s}
     .glass:active{transform:scale(.98)}
-    .glass .cup{width:100%;height:120px;border-radius:10px;position:relative;overflow:hidden;background:rgba(255,255,255,0.5);display:flex;align-items:flex-end;justify-content:center}
-    .water{position:absolute;left:0;right:0;bottom:0;height:0%;background:linear-gradient(180deg,var(--water),#56b8f0);transition:height .6s cubic-bezier(.2,.9,.3,1);display:flex;align-items:flex-end;justify-content:center}
-    .water.bubbly::after{content:'';position:absolute;left:12px;top:8px;width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.6);box-shadow:18px 8px rgba(255,255,255,0.2),36px 4px rgba(255,255,255,0.12);opacity:.9}
+    .glass .cup{width:100%;height:120px;border-radius:10px;position:relative;overflow:hidden;background:rgba(255,255,255,.5);display:flex;align-items:flex-end;justify-content:center}
+    .water{position:absolute;left:0;right:0;bottom:0;height:0%;background:linear-gradient(180deg,var(--water),#56b8f0);transition:height .6s cubic-bezier(.2,.9,.3,1)}
     .label{margin-top:10px;font-weight:600;color:#0b6aa6}
+    .glass.filled{box-shadow:0 8px 18px rgba(34,149,214,.12);border-color:rgba(42,167,255,.6)}
 
-    .glass.filled{box-shadow:0 8px 18px rgba(34,149,214,0.12);border-color:rgba(42,167,255,0.6)}
+    .side{display:flex;flex-direction:column;gap:16px;align-items:stretch}
+    .stage{display:flex;align-items:center;justify-content:center;min-height:220px;background:linear-gradient(180deg,#eafff1,#f6fff6);border:1px solid rgba(120,210,140,.18);border-radius:16px}
+    .char-img{width:220px;height:220px;border-radius:12px;transition:transform .35s ease;object-fit:contain}
+    .char-img.happy{transform:translateY(-6px) scale(1.05)}
 
-    /* sidebar with crocodile */
-    .side{display:flex;flex-direction:column;gap:18px;align-items:center}
-    .croc-wrap{width:100%;max-width:320px;background:linear-gradient(180deg,#eafff1,#f6fff6);border-radius:16px;padding:18px;border:1px solid rgba(120,210,140,0.18);display:flex;flex-direction:column;align-items:center;gap:12px}
     .meter{width:100%;height:12px;background:linear-gradient(90deg,#e6f7ff,#e6fff6);border-radius:10px;overflow:hidden}
-    .meter > i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#7fe1a3);transition:width .6s cubic-bezier(.2,.9,.3,1)}
-    .croc-svg{width:240px;height:160px}
-
-    /* crocodile happy animation */
-    .croc{transition:transform .35s ease}
-    .croc.happy{transform:translateY(-6px) rotate(-4deg) scale(1.02)}
-    .croc .eye{transition:transform .28s ease}
-    .croc.happy .eye{transform:scale(1.15)}
-    .croc .mouth{transition:d .28s ease}
+    .meter>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#7fe1a3);transition:width .6s cubic-bezier(.2,.9,.3,1)}
 
     .controls{display:flex;gap:8px}
-    button{appearance:none;border:0;padding:10px 12px;border-radius:10px;background:var(--accent);color:white;font-weight:700;cursor:pointer}
+    button{appearance:none;border:0;padding:10px 12px;border-radius:10px;background:var(--accent);color:#fff;font-weight:700;cursor:pointer}
     button.ghost{background:transparent;color:var(--muted);border:1px solid #dfeffb}
 
-    footer.small{font-size:12px;color:var(--muted);opacity:.9;text-align:center;margin-top:6px}
+    .char-picker{display:flex;gap:8px;flex-wrap:wrap}
+    .char-card{display:flex;align-items:center;gap:8px;border:1px solid #e6eef7;border-radius:12px;padding:8px 10px;cursor:pointer;user-select:none}
+    .char-card input{accent-color:var(--accent)}
 
-    @media (max-width:900px){.card{grid-template-columns:1fr;}.glasses{grid-template-columns:repeat(4,1fr)}.side{order:-1}}
-    @media (max-width:520px){.glasses{grid-template-columns:repeat(2,1fr)}.croc-svg{width:200px;height:120px}}
+    .toast{position:fixed;left:50%;top:18px;transform:translateX(-50%);background:#0b6aa6;color:#fff;padding:10px 14px;border-radius:10px;box-shadow:0 10px 24px rgba(0,0,0,.12);opacity:0;pointer-events:none;transition:opacity .25s ease}
+    .toast.show{opacity:1}
+
+    #confetti{position:fixed;inset:0;pointer-events:none;z-index:10}
   </style>
 </head>
 <body>
+  <canvas id="confetti"></canvas>
+  <div class="toast" id="toast"></div>
   <div class="wrap">
-    <div class="card" role="application" aria-label="یادآور ۸ لیوان آب">
+    <div class="card">
       <div>
         <h1>یادآور نوشیدن روزی ۸ لیوان آب</h1>
-        <p class="lead">هر لیوان را که نوشیدی بزن رویش تا پر شود — تمساحِ ما هم خوشحال می‌شود!</p>
-
-        <div class="glasses" id="glasses">
-          <!-- 8 glasses generated by JS -->
-        </div>
-
+        <p class="lead">هر لیوان را که نوشیدی بزن رویش تا پر شود — آقای رضاعتی (یکی از حیوانات ما) خوشحال می‌شود!</p>
+        <div class="glasses" id="glasses"></div>
         <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end;align-items:center">
           <div style="text-align:right"><div style="font-size:13px;color:var(--muted)">نوشیده شده</div><div id="count" style="font-weight:800;font-size:18px">0 / 8</div></div>
           <div style="flex:1"></div>
           <div class="controls">
             <button id="reset">تنظیم مجدد</button>
-            <button class="ghost" id="share" title="اشتراک‌گذاری">اشتراک</button>
           </div>
         </div>
       </div>
-
       <aside class="side">
-        <div class="croc-wrap">
-          <svg class="croc-svg" viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="تمساح">
-            <!-- A friendly cartoon crocodile: eyes, snout, mouth -->
-            <g id="croc" class="croc">
-              <defs>
-                <filter id="s" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0a3" flood-opacity="0.12"/>
-                </filter>
-              </defs>
-
-              <!-- body -->
-              <ellipse cx="200" cy="140" rx="160" ry="46" fill="#9fdc9f" stroke="#5bb05b" stroke-width="4" filter="url(#s)"/>
-
-              <!-- head -->
-              <path d="M60 110 C40 90, 40 50, 110 40 C170 30, 240 38, 300 58 C320 68, 340 88, 320 106 C300 126, 260 140, 200 142 C140 144,100 132,60 110 Z" fill="#8ad88a" stroke="#5bb05b" stroke-width="4"/>
-
-              <!-- eyes -->
-              <g transform="translate(140,58)">
-                <ellipse class="eye" cx="0" cy="-4" rx="18" ry="12" fill="#fff" stroke="#3b8c3b" stroke-width="3"/>
-                <circle cx="-2" cy="-4" r="5" fill="#123"/>
-              </g>
-              <g transform="translate(240,70)">
-                <ellipse class="eye" cx="0" cy="-4" rx="18" ry="12" fill="#fff" stroke="#3b8c3b" stroke-width="3"/>
-                <circle cx="2" cy="-4" r="5" fill="#123"/>
-              </g>
-
-              <!-- nostrils -->
-              <circle cx="180" cy="84" r="4" fill="#246" opacity="0.4"/>
-              <circle cx="220" cy="86" r="4" fill="#246" opacity="0.4"/>
-
-              <!-- mouth (two states: neutral and smile) -->
-              <path id="mouth" class="mouth" d="M120 120 Q200 138 280 126" fill="transparent" stroke="#2a6d2a" stroke-width="6" stroke-linecap="round"/>
-
-              <!-- tongue (appears when happy) -->
-              <path id="tongue" d="M200 126 C210 140, 230 140, 240 126" fill="#ff9fb2" opacity="0"/>
-
-              <!-- cheeks (blush when happy) -->
-              <circle id="cheekL" cx="130" cy="112" r="8" fill="#ffd7d7" opacity="0"/>
-              <circle id="cheekR" cx="270" cy="114" r="8" fill="#ffd7d7" opacity="0"/>
-            </g>
-          </svg>
-
-          <div style="width:100%;display:flex;justify-content:space-between;align-items:center">
-            <div style="text-align:right">
-              <div style="font-weight:800">تمساحپرآب</div>
-              <div style="font-size:13px;color:var(--muted)">با هر کلیک خوشحال می‌شود</div>
-            </div>
-            <div style="width:110px">
-              <div class="meter" aria-hidden="true"><i id="meterBar" style="width:0%"></i></div>
-            </div>
-          </div>
+        <div class="stage" id="stage"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+          <div style="font-weight:800">پیشرفت روز</div>
+          <div class="meter" style="flex:1"><i id="meterBar"></i></div>
         </div>
-
-        <div style="text-align:center">
-          <button id="randomDrink">بزن سریع ۱ لیوان</button>
-          <div class="small" style="margin-top:8px;color:var(--muted)">دکمه‌ی اشتراک برای اشتراک‌گذاری پیش‌فرض مرورگر است</div>
+        <div>
+          <div style="font-weight:700;margin:6px 0 8px">انتخاب شخصیت آقای رضاعتی 🐾</div>
+          <div class="char-picker" id="charPicker"></div>
         </div>
       </aside>
     </div>
   </div>
-
-  <script>
-    // Generate 8 glasses
-    const glassesEl = document.getElementById('glasses');
-    const countEl = document.getElementById('count');
-    const meterBar = document.getElementById('meterBar');
-    const croc = document.getElementById('croc');
-    const mouth = document.getElementById('mouth');
-    const tongue = document.getElementById('tongue');
-    const cheekL = document.getElementById('cheekL');
-    const cheekR = document.getElementById('cheekR');
-
-    let state = Array(8).fill(false);
-
-    function makeGlass(i){
-      const g = document.createElement('button');
-      g.className = 'glass';
-      g.setAttribute('aria-pressed','false');
-      g.setAttribute('aria-label', `لیوان ${i+1}`);
-      g.innerHTML = `
-        <div class="cup" aria-hidden="true">
-          <div class="water" id="water-${i}"></div>
-        </div>
-        <div class="label">لیوان ${i+1}</div>
-      `;
-
-      g.addEventListener('click',()=>toggleGlass(i,g));
-      return g;
-    }
-
-    function toggleGlass(i,el){
-      state[i] = !state[i];
-      const water = document.getElementById(`water-${i}`);
-      if(state[i]){
-        el.classList.add('filled');
-        el.setAttribute('aria-pressed','true');
-        water.style.height = '85%';
-        water.classList.add('bubbly');
-      } else {
-        el.classList.remove('filled');
-        el.setAttribute('aria-pressed','false');
-        water.style.height = '0%';
-        water.classList.remove('bubbly');
-      }
-      updateUI();
-      triggerCrocHappy();
-    }
-
-    function updateUI(){
-      const done = state.filter(Boolean).length;
-      countEl.textContent = `${done} / 8`;
-      const pct = Math.round((done/8)*100);
-      meterBar.style.width = pct + '%';
-    }
-
-    function triggerCrocHappy(){
-      // eat the animation: happy for 900ms
-      croc.classList.add('happy');
-      // mouth becomes curved smile
-      mouth.setAttribute('d','M120 120 Q200 158 280 126');
-      tongue.setAttribute('opacity','1');
-      cheekL.setAttribute('opacity','0.9');
-      cheekR.setAttribute('opacity','0.9');
-
-      setTimeout(()=>{
-        croc.classList.remove('happy');
-        mouth.setAttribute('d','M120 120 Q200 138 280 126');
-        tongue.setAttribute('opacity','0');
-        cheekL.setAttribute('opacity','0');
-        cheekR.setAttribute('opacity','0');
-      },900);
-    }
-
-    // populate
-    for(let i=0;i<8;i++){
-      const g = makeGlass(i);
-      glassesEl.appendChild(g);
-    }
-
-    // random quick drink
-    document.getElementById('randomDrink').addEventListener('click',()=>{
-      // find first unchecked
-      const idx = state.indexOf(false);
-      if(idx>=0){
-        const btn = glassesEl.children[idx];
-        btn.click();
-      } else {
-        // all done -> reset and animate
-        flashAll();
-      }
-    });
-
-    document.getElementById('reset').addEventListener('click',()=>{
-      state = state.map(()=>false);
-      for(let i=0;i<8;i++){
-        const water = document.getElementById(`water-${i}`);
-        water.style.height = '0%';
-        glassesEl.children[i].classList.remove('filled');
-        glassesEl.children[i].setAttribute('aria-pressed','false');
-      }
-      updateUI();
-    });
-
-    document.getElementById('share').addEventListener('click',async ()=>{
-      try{
-        await navigator.share?.({title:'یادآور نوشیدن آب',text:'من دارم روزی ۸ لیوان آب می‌خورم! تو هم امتحان کن 🙂',url:location.href});
-      }catch(e){
-        alert('امکان اشتراک‌گذاری خودکار موجود نیست؛ لینک صفحه را کپی کنید.');
-      }
-    });
-
-    function flashAll(){
-      // small celebration when finishing
-      croc.classList.add('happy');
-      mouth.setAttribute('d','M120 120 Q200 186 280 126');
-      tongue.setAttribute('opacity','1');
-      cheekL.setAttribute('opacity','0.9');
-      cheekR.setAttribute('opacity','0.9');
-      // animate all waters full then reset
-      for(let i=0;i<8;i++){
-        const water = document.getElementById(`water-${i}`);
-        water.style.height = '85%';
-        glassesEl.children[i].classList.add('filled');
-        state[i] = true;
-      }
-      updateUI();
-      setTimeout(()=>{
-        // keep happy state for a bit
-        croc.classList.remove('happy');
-        mouth.setAttribute('d','M120 120 Q200 138 280 126');
-        tongue.setAttribute('opacity','0');
-        cheekL.setAttribute('opacity','0');
-        cheekR.setAttribute('opacity','0');
-      },1200);
-    }
-
-    // keyboard shortcut: press numbers 1-8 to toggle glasses
-    window.addEventListener('keydown',e=>{
-      if(e.keyCode>=49 && e.keyCode<=56){
-        const idx = e.keyCode - 49;
-        glassesEl.children[idx].click();
-      }
-    });
-
-    // initial UI
-    updateUI();
-  </script>
+<script>
+const CHARACTERS = {
+  cat:{name:'گربه',src:'https://cdn-icons-png.flaticon.com/512/616/616408.png'},
+  dog:{name:'سگ',src:'https://cdn-icons-png.flaticon.com/512/616/6164089.png'},
+  cow:{name:'گاو',src:'https://cdn-icons-png.flaticon.com/512/1998/1998610.png'},
+  lion:{name:'شیر',src:'https://cdn-icons-png.flaticon.com/512/616/616431.png'},
+  panda:{name:'پاندا',src:'https://cdn-icons-png.flaticon.com/512/616/6164084.png'}
+};
+let selected='cat';
+const state=JSON.parse(localStorage.getItem('drinkState')||'[]').length?JSON.parse(localStorage.getItem('drinkState')):Array(8).fill(false);
+function save(){localStorage.setItem('drinkState',JSON.stringify(state));localStorage.setItem('char',selected)}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1500)}
+function cheer(){const img=document.querySelector('.char-img');img.classList.add('happy');setTimeout(()=>img.classList.remove('happy'),700)}
+function update(){const done=state.filter(Boolean).length;document.getElementById('count').textContent=`${done} / 8`;document.getElementById('meterBar').style.width=`${(done/8)*100}%`;if(done===8)confetti();}
+function toggle(i,el){state[i]=!state[i];el.classList.toggle('filled');el.querySelector('.water').style.height=state[i]?'85%':'0%';save();cheer();showToast(`آقای رضاعتی (${CHARACTERS[selected].name}) خوشحال شد!`);update();}
+function loadChar(){selected=localStorage.getItem('char')||'cat';renderCharPicker();renderStage();}
+function renderCharPicker(){const p=document.getElementById('charPicker');p.innerHTML='';for(const [k,v] of Object.entries(CHARACTERS)){const l=document.createElement('label');l.className='char-card';l.innerHTML=`<input type='radio' name='char' value='${k}' ${selected===k?'checked':''}>${v.name}`;l.querySelector('input').onchange=()=>{selected=k;save();renderStage();};p.append(l)}}
+function renderStage(){const s=document.getElementById('stage');s.innerHTML='';const img=document.createElement('img');img.src=CHARACTERS[selected].src;img.className='char-img';s.append(img);}
+function confetti(){const canvas=document.getElementById('confetti');const ctx=canvas.getContext('2d');canvas.width=innerWidth;canvas.height=innerHeight;const colors=['#2aa7ff','#7fe1a3','#ffd166','#ef476f','#8338ec'];const pieces=Array.from({length:150},()=>({x:Math.random()*innerWidth,y:Math.random()*-innerHeight,vx:-2+Math.random()*4,vy:2+Math.random()*3,color:colors[Math.floor(Math.random()*colors.length)],r:Math.random()*2*Math.PI,vr:-.2+Math.random()*.4,w:5+Math.random()*5,h:8+Math.random()*10}));const t0=performance.now();(function draw(t){ctx.clearRect(0,0,canvas.width,canvas.height);for(const p of pieces){p.y+=p.vy;p.x+=p.vx;p.r+=p.vr;if(p.y>canvas.height)p.y=-10;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.fillStyle=p.color;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();}if(t-t0<4000)requestAnimationFrame(draw)})();showToast('۸ لیوان کامل شد 🎉');}
+// glasses
+const g=document.getElementById('glasses');for(let i=0;i<8;i++){const b=document.createElement('button');b.className='glass'+(state[i]?' filled':'');b.innerHTML=`<div class='cup'><div class='water' style='height:${state[i]?'85%':'0%'}'></div></div><div class='label'>لیوان ${i+1}</div>`;b.onclick=()=>toggle(i,b);g.append(b)}
+loadChar();update();
+// hourly notification
+if('Notification'in window){Notification.requestPermission().then(p=>{if(p==='granted'){setInterval(()=>{const done=state.filter(Boolean).length;if(done<8)new Notification('یادآور آب 💧',{body:`آقای رضاعتی (${CHARACTERS[selected].name}) منتظر لیوان بعدی است!`})},3600000)}})}
+</script>
 </body>
 </html>
