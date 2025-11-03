@@ -254,9 +254,9 @@ function scheduleNextReminder(delayMs){
     // اگر هنوز به ۸ نرسیده‌ایم، دوباره یک ساعت بعد یادآوری کن
     if (getDone() < 8){
       showWaterNotification('یه لیوان دیگه بزن که برسی به ۸ تا! 💪');
-      const nextAt = Date.now() + 5*1000;
+      const nextAt = Date.now() + 60*60*1000;
       localStorage.setItem('nextReminderAt', String(nextAt));
-      scheduleNextReminder(5*1000);
+      scheduleNextReminder(60*60*1000);
     } else {
       stopHourlyReminders();
     }
@@ -265,7 +265,7 @@ function scheduleNextReminder(delayMs){
 
 function startHourlyReminders(fromTs){
   // از همین لحظه یک ساعت بعد را می‌چینیم
-  const nextAt = fromTs + 5*1000;
+  const nextAt = fromTs + 60*60*1000;
   localStorage.setItem('nextReminderAt', String(nextAt));
   scheduleNextReminder(nextAt - Date.now());
 }
@@ -287,9 +287,9 @@ function stopHourlyReminders(){
     askNotifOnce().then(granted=>{
       if (!granted) return;
       showWaterNotification();
-      const nextAt = Date.now() + 5*1000;
+      const nextAt = Date.now() + 60*60*1000;
       localStorage.setItem('nextReminderAt', String(nextAt));
-      scheduleNextReminder(5*1000);
+      scheduleNextReminder(60*60*1000);
     });
   } else {
     scheduleNextReminder(diff);
