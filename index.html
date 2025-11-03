@@ -36,7 +36,7 @@
     .meter{width:100%;height:12px;background:linear-gradient(90deg,#e6f7ff,#e6fff6);border-radius:10px;overflow:hidden}
     .meter>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#7fe1a3);transition:width .6s cubic-bezier(.2,.9,.3,1)}
 
-    .controls{display:flex;gap:8px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap}
     button{appearance:none;border:0;padding:10px 12px;border-radius:10px;background:var(--accent);color:#fff;font-weight:700;cursor:pointer}
     button.ghost{background:transparent;color:var(--muted);border:1px solid #dfeffb}
 
@@ -90,6 +90,10 @@
           </div>
           <div style="flex:1"></div>
           <div class="controls">
+            <label style="font-size:13px;color:#555;display:flex;align-items:center;gap:6px">
+              زمان یادآوری (دقیقه):
+              <input id="remInput" type="number" min="1" value="60" style="width:74px;padding:5px;border:1px solid #ccc;border-radius:6px;text-align:center">
+            </label>
             <button id="reset">تنظیم مجدد</button>
           </div>
         </div>
@@ -211,52 +215,51 @@ function update(){
   meterBar.style.width=`${(done/8)*100}%`;
 }
 
-
-
 // ===== Notification permission (ask once) =====
 const NOTIF_FLAG = 'notifAskedV1';
 let notifAsked = localStorage.getItem(NOTIF_FLAG) === '1';
 
 async function askNotifOnce(){
-  // اگر قبلاً پرسیدیم یا API نیست، دیگه نپرس
   if (notifAsked || !('Notification' in window)) return Notification?.permission === 'granted';
-
-  // اگر وضعیت دیگه default نیست (granted/denied)، باز هم تکرار نکن
   if (Notification.permission !== 'default') {
-    notifAsked = true;
-    localStorage.setItem(NOTIF_FLAG, '1');
+    notifAsked = true; localStorage.setItem(NOTIF_FLAG, '1');
     return Notification.permission === 'granted';
   }
-
-  // فقط یک‌بار درخواست؛ حتماً از داخل تعامل کاربر صدا زده می‌شود
-  try {
+  try{
     const res = await Notification.requestPermission();
-    notifAsked = true;
-    localStorage.setItem(NOTIF_FLAG, '1');
+    notifAsked = true; localStorage.setItem(NOTIF_FLAG, '1');
     return res === 'granted';
-  } catch {
-    notifAsked = true;
-    localStorage.setItem(NOTIF_FLAG, '1');
+  }catch{
+    notifAsked = true; localStorage.setItem(NOTIF_FLAG, '1');
     return false;
   }
 }
-// ===== Notifications: timing & schedule (hourly) =====
+
+// ===== Notifications: timing & schedule (user-configurable) =====
 let reminderTimer = null;
+// مقدار پیش‌فرض دقیقه (قابل ویرایش از UI و ذخیره در localStorage)
+let reminderMinutes = Number(localStorage.getItem('remMinutes')) || 60;
+function getReminderMs(){ return reminderMinutes * 60 * 1000; }
 
 function showWaterNotification(msg='وقتِ آب خوردنه 💧'){
   if (!('Notification' in window) || Notification.permission!=='granted') return;
-  new Notification('یادآور آب',{ body: msg, dir: 'rtl' });
+  try{
+    new Notification('یادآور آب',{ body: msg, dir:'rtl', silent:false });
+  }catch(e){
+    // fallback ساده
+    console.warn('Notification failed, fallback alert:', e);
+    alert(msg);
+  }
 }
 
 function scheduleNextReminder(delayMs){
   clearTimeout(reminderTimer);
   reminderTimer = setTimeout(()=>{
-    // اگر هنوز به ۸ نرسیده‌ایم، دوباره یک ساعت بعد یادآوری کن
     if (getDone() < 8){
       showWaterNotification('یه لیوان دیگه بزن که برسی به ۸ تا! 💪');
-      const nextAt = Date.now() + 60*60*1000;
+      const nextAt = Date.now() + getReminderMs();
       localStorage.setItem('nextReminderAt', String(nextAt));
-      scheduleNextReminder(60*60*1000);
+      scheduleNextReminder(getReminderMs());
     } else {
       stopHourlyReminders();
     }
@@ -264,15 +267,14 @@ function scheduleNextReminder(delayMs){
 }
 
 function startHourlyReminders(fromTs){
-  // از همین لحظه یک ساعت بعد را می‌چینیم
-  const nextAt = fromTs + 60*60*1000;
+  const nextAt = fromTs + getReminderMs();
   localStorage.setItem('nextReminderAt', String(nextAt));
   scheduleNextReminder(nextAt - Date.now());
 }
 
 function stopHourlyReminders(){
   clearTimeout(reminderTimer);
-  reminderTimer = null;
+  reminderTimer=null;
   localStorage.removeItem('nextReminderAt');
 }
 
@@ -283,21 +285,17 @@ function stopHourlyReminders(){
   if (getDone() >= 8){ stopHourlyReminders(); return; }
   const diff = saved - Date.now();
   if (diff <= 0){
-    // موعد گذشته: همین الان یک نوتیف بفرست و بعدی را یک ساعت بعد
     askNotifOnce().then(granted=>{
       if (!granted) return;
       showWaterNotification();
-      const nextAt = Date.now() + 60*60*1000;
+      const nextAt = Date.now() + getReminderMs();
       localStorage.setItem('nextReminderAt', String(nextAt));
-      scheduleNextReminder(60*60*1000);
+      scheduleNextReminder(getReminderMs());
     });
   } else {
     scheduleNextReminder(diff);
   }
 })();
-
-
-
 
 // ===== Logic =====
 function toggle(i,el){
@@ -310,23 +308,19 @@ function toggle(i,el){
   el.classList.toggle('filled',state[i]);
   w.style.height=state[i]?'85%':'0%';
   save();
-  // فقط وقتی کاربر یک لیوان را «پر» کرد و هنوز به ۸ نرسیده‌ایم، زمان را از الان ست کن
-if (state[i]) {
-  askNotifOnce().then(granted=>{
-    if (granted && getDone() < 8) startHourlyReminders(Date.now());
-  });
-}
 
-  // فقط اولین بار که کاربر یه لیوان رو پر می‌کنه، اجازه‌ی نوتیف رو (حداکثر یک‌بار) بپرس
-if (state[i]) { askNotifOnce(); }
-
-
+  // اجازه نوتیف فقط یک‌بار + شروع زمان‌بندی از همین لحظه
+  if (state[i]) {
+    askNotifOnce().then(granted=>{
+      if (granted && getDone() < 8) startHourlyReminders(Date.now());
+    });
+  }
 
   if(state[i]){ face('happy'); sparkle(['✨','💖','💦']); showToast(`اقای رضائتی (${CHARACTERS[selected].name}) خوشحال شد!`) }
   else{ face('angry'); sparkle(['💢','💢','😤']); showToast('اقای رضائتی گفت: واسه چی خالی کردی لاشی؟! 😠') }
 
   const doneAfter=getDone();
-  if(doneBefore<8 && doneAfter===8){ celebrateExplosion(); }
+  if(doneBefore<8 && doneAfter===8){ celebrateExplosion(); stopHourlyReminders(); }
   update();
 }
 
@@ -335,11 +329,7 @@ function resetAll(){
   save(); renderGlasses(); update();
   clearConfetti();
   stopHourlyReminders();
-
 }
-
-
-stopHourlyReminders(); // رسیدیم به ۸ → تایمرها قطع
 
 // ===== Explosion Confetti + Top Big Message =====
 function celebrateExplosion(){
@@ -354,7 +344,7 @@ function celebrateExplosion(){
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(prefersReduced){
     showToast('آفرین! ۸ لیوان کامل شد 🎉');
-    setTimeout(()=>{ bigMsg.classList.remove('show'); bigMsg.style.opacity='0'; }, 4200); // دیرتر حذف شود
+    setTimeout(()=>{ bigMsg.classList.remove('show'); bigMsg.style.opacity='0'; }, 4200);
     return;
   }
 
@@ -382,7 +372,7 @@ function celebrateExplosion(){
         drag:0.985,
         w:3+Math.random()*8, h:6+Math.random()*16,
         r:Math.random()*6, vr:-0.45+Math.random()*0.9,
-        life:1200+Math.random()*1400, // عمر بیشتر
+        life:1200+Math.random()*1400,
         c:colors[Math.floor(Math.random()*colors.length)]
       });
     }
@@ -402,7 +392,6 @@ function celebrateExplosion(){
       p.r += p.vr;
       p.life -= dt;
 
-      // برخورد آرام با دیواره‌ها
       if(p.x < 0 || p.x > W){ p.vx *= -0.8; p.x=Math.max(0,Math.min(W,p.x)); }
       if(p.y > H){ p.vy *= -0.6; p.y = H; }
 
@@ -415,7 +404,6 @@ function celebrateExplosion(){
       if(pieces[i].life<=0) pieces.splice(i,1);
     }
 
-    // مدت طولانی‌تر برای پوشش کامل
     if(ts - startTs < 6200 && pieces.length){
       confettiRaf = requestAnimationFrame(draw);
     }else{
@@ -437,6 +425,18 @@ function celebrateExplosion(){
 
 // ===== init =====
 renderGlasses(); renderStage(); renderPicker(); update();
+
+// اینپوت تنظیم زمان یادآوری
+const remInput = document.getElementById('remInput');
+remInput.value = reminderMinutes;
+remInput.addEventListener('change', ()=>{
+  const val = Math.max(1, Number(remInput.value)||60);
+  reminderMinutes = val;
+  localStorage.setItem('remMinutes', String(val));
+  showToast(`زمان یادآوری روی ${val} دقیقه تنظیم شد`);
+});
+
+// ریست
 document.getElementById('reset').addEventListener('click',resetAll);
 </script>
 </body>
